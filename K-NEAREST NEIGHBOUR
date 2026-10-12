@@ -1,0 +1,44 @@
+import pandas as pd 
+import numpy as np 
+import seaborn as sns 
+import matplotlib.pyplot as plt 
+from sklearn import datasets 
+from sklearn.model_selection import train_test_split 
+from sklearn.neighbors import KNeighborsClassifier 
+from sklearn.metrics import accuracy_score 
+iris=datasets.load_iris() 
+X=iris.data 
+y=iris.target 
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42) 
+knn=KNeighborsClassifier(n_neighbors=3) 
+knn.fit(X_train,y_train) 
+y_pred=knn.predict(X_test) 
+correct_count=0 
+wrong_count=0 
+for i,(true_label,pred_label)in enumerate(zip(y_test,y_pred)): 
+    if true_label==pred_label: 
+        print(f"index{i}:correct - 
+Predicted={iris.target_names[pred_label]},Acutal={iris.target_names[true_label]}") 
+        correct_count+=1 
+    else: 
+        print(f"index{i}:correct - 
+predicted={iris.target_names[pred_label]},Actual={iris.target_names[true_label]}") 
+        wrong_count+=1
+print(f"\n totalcorrect pred:{correct_count}") 
+print(f"\n total wrong pred:{wrong_count}") 
+accuracy=accuracy_score(y_pred,y_test) 
+print(f"accuracy:{accuracy*100:.2f}%") 
+df = pd.DataFrame(X, columns=iris.feature_names) 
+df['species'] = [iris.target_names[i] for i in y] 
+plt.figure(figsize=(8, 6)) 
+sns.scatterplot(x=df.iloc[:, 2], y=df.iloc[:, 3], hue=df['species'], palette='Set1', s=80) 
+plt.title('Iris Dataset - Petal Length vs Petal Width') 
+plt.xlabel('Petal Length (cm)') 
+plt.ylabel('Petal Width (cm)') 
+plt.grid(True) 
+plt.show() 
+df=pd.DataFrame(X, columns=iris.feature_names) 
+df['species']=[iris.target_names[i]for i in y] 
+plt.figure(figsize=(6,6)) 
+sns.scatterplot(x=df.iloc[:,2],y=df.iloc[:,3],hue=df['species'],palette='Set1',s=80) 
+plt.grid(True)
