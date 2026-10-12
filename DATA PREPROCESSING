@@ -1,0 +1,56 @@
+import pandas as pd 
+import numpy as np 
+from sklearn.impute import SimpleImputer 
+from sklearn.preprocessing import OneHotEncoder, StandardScaler 
+from sklearn.compose import ColumnTransformer 
+from sklearn.pipeline import Pipeline 
+data={ 
+    'Age':[25,30,np.nan,45,22,38,50,np.nan], 
+    'Salary':[50000,60000,75000,np.nan,48000,80000,90000,65000], 
+    'Gender':['Male','Female','Male','Female','Male','Female','Male','Female'], 
+    'city':['New York','London','Paris','New York','London','Paris','New York','London'], 
+    'Purchased':['no','yes','no','yes','no','yes','no','yes'] 
+} 
+df=pd.DataFrame(data) 
+print("Original DataFrame:") 
+print(df) 
+print("\n") 
+imputer_numerical = SimpleImputer(strategy='mean') 
+imputer_Categorical = SimpleImputer(strategy='most_frequent') 
+#Define transformers for numerical and categorical features 
+numerical_features=['Age','Salary'] 
+Categorical_features=['Gender','city'] 
+preprocessor=ColumnTransformer(transformers=[('num_imputer',imputer_numerical,numerical_features), 
+                    ('cat_imputer',imputer_Categorical,Categorical_features)], remainder='passthrough')
+#apply imputation 
+def_imputed=pd.DataFrame(preprocessor.fit_transform(df), 
+columns=numerical_features+Categorical_features+['purchased']) 
+print("Dataframe after imputation") 
+print(def_imputed) 
+print("\n") 
+#using OneHotEncoder for 'Gender' and 'city' 
+encoder=OneHotEncoder(handle_unknown='ignore',sparse_output=False) 
+#column transformers to apply encoding only to specified columns 
+Categorical_transformer=Pipeline(steps=[('onehot',encoder)]) 
+#preprocessor for encoding 
+preprocessor_encoding=ColumnTransformer(transformers=[('cat',Categorical_transformer,['Gender','city'])],
+remainder='passthrough') 
+#encoding 
+def_encoded=preprocessor_encoding.fit_transform(def_imputed) 
+encoded_feature_names=preprocessor_encoding.named_transformers_['cat']['onehot'].get_feature_names_o
+ut(['Gender','city']) 
+remaining_features=[col for col in def_imputed.columns if col not in ['Gender','city']] 
+def_encoded=pd.DataFrame(def_encoded,columns=list(encoded_feature_names)+remaining_features) 
+print("DataFrame after one-hot encoding:") 
+print(def_encoded) 
+print("\n") 
+#Scaling(standardization) 
+scaler=StandardScaler() 
+numerical_transformer=Pipeline(steps=[('scaler',scaler)]) 
+#preprocessing for scaling 
+preprocessor_scaling=ColumnTransformer(transformers=[('num',numerical_transformer,['Age','Salary'])],re
+mainder='passthrough') 
+df_scaled= preprocessor_scaling.fit_transform(def_encoded) 
+df_scaled=pd.DataFrame(df_scaled,columns=def_encoded.columns) 
+print("DataFrame after scaling:") 
+print(df_scaled) 
