@@ -1,0 +1,96 @@
+from sklearn.datasets import fetch_california_housing 
+import pandas as pd 
+import numpy as np 
+import seaborn as sns 
+import matplotlib.pyplot as plt 
+# Load California Housing Dataset 
+housing = fetch_california_housing() 
+housing_df = pd.DataFrame( 
+housing.data, 
+columns=housing.feature_names 
+) 
+housing_df['MedHouseValue'] = housing.target 
+# Display first 5 rows 
+print(housing_df.head()) 
+# Check missing values 
+print(housing_df.isnull().sum()) 
+# Correlation Analysis 
+correlation_matrix = housing_df.corr() 
+print(correlation_matrix['MedHouseValue']) 
+# Correlation Heatmap 
+plt.figure(figsize=(8,5)) 
+sns.heatmap( 
+housing_df.corr(), 
+annot=True,
+ cmap='coolwarm' 
+) 
+plt.title('Correlation Matrix') 
+plt.show() 
+# Select important features 
+selected_features = [ 
+    'MedInc', 
+    'AveRooms', 
+    'AveOccup' 
+] 
+X = housing_df[selected_features] 
+y = housing_df['MedHouseValue'] 
+# Feature Scaling 
+from sklearn.preprocessing import StandardScaler 
+scaler = StandardScaler() 
+X_scaled = scaler.fit_transform(X) 
+print(X_scaled) 
+# Split Dataset 
+from sklearn.model_selection import train_test_split 
+from sklearn.linear_model import LinearRegression 
+from sklearn.metrics import mean_squared_error, r2_score 
+X_train, X_test, y_train, y_test = train_test_split( 
+    X_scaled, 
+    y, 
+    test_size=0.2, 
+    random_state=42 
+) 
+# Linear Regression Model 
+model = LinearRegression() 
+model.fit( 
+    X_train, 
+    y_train 
+) 
+# Prediction 
+y_pred = model.predict(X_test) 
+# Model Evaluation 
+print("Mean Squared Error:", 
+      mean_squared_error(y_test, y_pred)) 
+print("R-squared:", 
+      r2_score(y_test, y_pred)) 
+# Residual Plot 
+residuals = y_test - y_pred 
+plt.scatter( 
+    y_pred, 
+    residuals, 
+    alpha=0.5 
+) 
+plt.xlabel('Predicted Values') 
+plt.ylabel('Residuals') 
+plt.title('Residual Plot') 
+plt.axhline( 
+    y=0, 
+    color='red', 
+    linestyle='--' 
+) 
+plt.show() 
+# Predicted vs Actual Plot 
+plt.scatter(
+y_test, 
+y_pred, 
+alpha=0.5 
+) 
+plt.xlabel('Actual Values') 
+plt.ylabel('Predicted Values') 
+plt.title('Predicted vs Actual Values') 
+plt.plot( 
+[y_test.min(), y_test.max()], 
+[y_test.min(), y_test.max()], 
+'r--', 
+lw=4 
+) 
+plt.show()
