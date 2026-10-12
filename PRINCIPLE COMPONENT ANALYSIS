@@ -1,0 +1,40 @@
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from sklearn.preprocessing import StandardScaler 
+from sklearn.decomposition import PCA 
+# Step 2: Load Dataset 
+df = pd.read_csv("wine-quality-white-and-red.csv")   # replace with your Kaggle file name 
+# Step 3: Handle categorical column 'type' if present 
+if "type" in df.columns: 
+# Option A: Drop it (simpler) 
+df = df.drop("type", axis=1) 
+# ---- OR ---- 
+# Option B: Encode it numerically (keep it in PCA) 
+# df = pd.get_dummies(df, columns=["type"], drop_first=True) 
+# Step 4: Features and Target 
+X = df.drop("quality", axis=1)   # features 
+y = df["quality"]                
+# target 
+# Step 5: Standardize the Data 
+scaler = StandardScaler() 
+X_scaled = scaler.fit_transform(X)  
+# Step 6: Apply PCA 
+pca = PCA(n_components=2) 
+X_pca = pca.fit_transform(X_scaled) 
+# Step 7: Create DataFrame for Visualization
+df_pca = pd.DataFrame(data=X_pca, columns=['PC1', 'PC2']) 
+df_pca['Target'] = y 
+# Step 8: Plot PCA Results 
+plt.figure(figsize=(8, 6)) 
+sns.scatterplot(x='PC1', y='PC2', hue='Target', palette='Set1', data=df_pca, legend="full") 
+plt.title('PCA on Wine Quality Dataset') 
+plt.xlabel('Principal Component 1') 
+plt.ylabel('Principal Component 2') 
+plt.legend(title='Wine Quality') 
+plt.grid(True) 
+plt.show() 
+# Step 9: Explained Variance 
+print("Explained Variance Ratio:", pca.explained_variance_ratio_) 
+print("Total Variance Captured:", sum(pca.explained_variance_ratio_))
