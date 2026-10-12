@@ -1,0 +1,31 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+from sklearn.datasets import load_breast_cancer 
+from sklearn.model_selection import train_test_split 
+from sklearn.preprocessing import StandardScaler 
+from sklearn.svm import SVC 
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score 
+data = load_breast_cancer() 
+X = data.data 
+y = data.target 
+print("Feature Names: ",data.feature_names[:5],"...") 
+print("Target Names: ", data.target_names) 
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = 0.2, random_state = 42,stratify = y) 
+scaler = StandardScaler() 
+X_train = scaler.fit_transform(X_train) 
+X_test = scaler.transform(X_test) 
+svm_clf = SVC(kernel = 'linear', C = 1 ,random_state = 42) 
+svm_clf.fit(X_train,y_train) 
+y_pred = svm_clf.predict(X_test) 
+print("\n Confusion Matrix") 
+print(confusion_matrix(y_test,y_pred)) 
+print("\nClassification Report: ") 
+print(classification_report(y_test,y_pred,target_names = data.target_names)) 
+print("Accuracy: ", accuracy_score(y_test,y_pred)) 
+if svm_clf.kernel == "linear":
+  plt.figure(figsize = (5,2)) 
+    plt.bar(range(len(svm_clf.coef_[0])),svm_clf.coef_[0]) 
+    plt.title("Feature Importance (svm coefficients)") 
+    plt.xlabel("Feature Index") 
+    plt.ylabel("Coefficient Value") 
+    plt.show() 
