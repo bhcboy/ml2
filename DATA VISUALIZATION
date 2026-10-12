@@ -1,0 +1,41 @@
+import pandas as pd 
+import seaborn as sns 
+import matplotlib.pyplot as plt 
+from sklearn import datasets 
+# Step 2: Load the Iris dataset 
+iris = datasets.load_iris() 
+df = pd.DataFrame(data=iris.data, columns=iris.feature_names) 
+df['species'] = iris.target 
+df['species'] = df['species'].map({i: name for i, name in enumerate(iris.target_names)}) 
+# Step 3: Basic data exploration 
+print("First 5 rows of the dataset:") 
+print(df.head()) 
+print("Last 5 rows of the dataset:") 
+print(df.tail()) 
+print("\n Dataset Info:") 
+print(df.info()) 
+print("\n Summary statistics:") 
+print(df.describe()) 
+print("\n Class distribution:") 
+print(df['species'].value_counts()) 
+# Step 4: Data Visualization 
+# 4.1 Pairplot for feature relationships 
+sns.pairplot(df, hue='species', palette='Set2') 
+plt.suptitle("Pairplot of Iris Features", y=1.02) 
+plt.show()
+# 4.2 Boxplot for feature distribution 
+plt.figure(figsize=(10, 6)) 
+sns.boxplot(data=df, orient="h", palette="Set3") 
+plt.title("Boxplot of Iris Features") 
+plt.show() 
+plt.figure(figsize=(8,6)) 
+corr = df.drop("species", axis=1).corr() 
+sns.heatmap( 
+corr, 
+annot=True, 
+cmap="coolwarm", 
+linewidths=0.5, 
+fmt=".2f" 
+) 
+plt.title("Correlation Heatmap of Iris Dataset") 
+plt.show()
